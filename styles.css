@@ -1,0 +1,375 @@
+/* --- 1. Global Variables and Body Styles --- */
+:root {
+    --text-color: #1a1a1a;
+    --header-bg: #ffffff;
+    --column-bg: #f1f1f1;
+    --card-bg: #ffffff;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --accent-color: #3b82f6;
+    --sidebar-width: 240px;
+    --glass-bg: rgba(255, 255, 255, 0.5); 
+}
+
+body.dark-mode {
+    --text-color: #f0f0f0;
+    --header-bg: #1e1e1e;
+    --column-bg: #2c2c2c;
+    --card-bg: #333333;
+    --border-color: #444444;
+    --glass-bg: rgba(30, 30, 30, 0.5);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    
+    /* Set your desired background image */
+    background-image: url('images/background1.jpeg'); /* Make sure you have this image */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Optional: background overlay for readability */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: -1;
+}
+
+.hidden { display: none !important; }
+.message { min-height: 20px; font-weight: 500; color: white; }
+
+
+/* --- 2. Focus Window Login Page Styles --- */
+#focus-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#login-window {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2);
+    text-align: center;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Initial State: Button Only */
+#unlock-button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+#unlock-button:hover {
+    transform: scale(1.05);
+}
+
+/* Expanded State: Form Visible */
+#login-window.expanded {
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 400px;
+}
+#login-window.expanded #unlock-button {
+    display: none;
+}
+#login-form-wrapper {
+    transition: all 0.4s ease 0.2s;
+    opacity: 1;
+    max-height: 500px;
+}
+#login-form-wrapper.collapsed {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+/* Form Styles */
+#login-form-wrapper h2 { margin-top: 0; color: white; }
+#login-form-wrapper form { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+.input-container { position: relative; }
+#login-form-wrapper input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white; padding: 0.8rem; border-radius: 10px; font-size: 1rem;
+    width: 100%; box-sizing: border-box;
+}
+#login-form-wrapper input::placeholder { color: rgba(255,255,255,0.7); }
+#login-form-wrapper input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+#login-form-wrapper button {
+    padding: 0.8rem; border: none; border-radius: 10px; background-color: var(--accent-color);
+    color: white; font-weight: bold; cursor: pointer; font-size: 1rem;
+}
+.toggle-link { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-top: 1.5rem; }
+.toggle-link a { color: white; text-decoration: none; font-weight: bold; }
+
+/* Success Animation */
+#login-window.success {
+    border-radius: 0;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0;
+}
+
+/* Sign-up container styles (now hidden, but kept for reference) */
+#signup-container { 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 400px; 
+    padding: 2rem; 
+    background-color: var(--header-bg); 
+    border-radius: 8px; 
+    text-align: center; 
+    box-shadow: 0 4px 12px var(--shadow-color); 
+    z-index: 10;
+}
+#signup-container form { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+#signup-container input { padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--bg-color); color: var(--text-color); font-size: 1rem; }
+#signup-container button { padding: 0.75rem; border: none; border-radius: 6px; background-color: var(--accent-color); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
+#signup-container hr { border: none; border-top: 1px solid var(--border-color); margin: 2rem 0; }
+#signup-container a { color: var(--accent-color); text-decoration: none; }
+
+
+/* --- 3. Main App Layout --- */
+#app-layout { display: flex; height: 100vh; }
+
+#sidebar {
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-right: 1px solid var(--border-color);
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+    transition: margin-left 0.3s ease-in-out;
+}
+#sidebar.collapsed { margin-left: calc(-1 * var(--sidebar-width)); }
+.sidebar-header { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+.sidebar-header #logo { cursor: pointer; user-select: none; font-size: 1.5rem; font-weight: bold; }
+.sidebar-nav ul { list-style: none; padding: 0; margin: 1rem 0; }
+.sidebar-nav li a { display: block; padding: 0.75rem 1.5rem; color: var(--text-color); text-decoration: none; border-radius: 6px; margin: 0.25rem 0.5rem; }
+.sidebar-nav li a:hover { background-color: var(--column-bg); }
+.sidebar-nav li.active a { background-color: var(--accent-color); color: white; font-weight: 500; }
+
+#main-content {
+    flex-grow: 1; display: flex;
+    flex-direction: column; overflow: hidden;
+}
+
+header {
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 2rem; border-bottom: 1px solid var(--border-color); flex-shrink: 0;
+}
+#menu-toggle { font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--text-color); }
+header .controls { display: flex; gap: 1rem; }
+header .controls button { background: none; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; font-size: 1.25rem; cursor: pointer; line-height: 1; }
+#signout-button { padding: 0.5rem 1rem; font-size: 1rem; }
+
+#dashboard { overflow: auto; }
+
+.dashboard-container { display: flex; gap: 1.5rem; padding: 2rem; }
+.task-column {
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px; padding: 1rem;
+    width: 320px; flex-shrink: 0; min-height: 300px;
+}
+.task-column h2 { font-size: 1.1rem; margin-top: 0; padding-bottom: 1rem; }
+.task-card { background-color: var(--card-bg); border-radius: 6px; padding: 1rem; margin-top: 1rem; box-shadow: 0 2px 4px var(--shadow-color); border-left: 4px solid transparent; cursor: grab; position: relative; }
+.task-card p { margin: 0; }
+.task-card.dragging { opacity: 0.5; }
+.priority-high { border-left-color: #ef4444; }
+.priority-medium { border-left-color: #f59e0b; }
+.priority-low { border-left-color: #10b981; }
+
+.delete-task-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--text-color); opacity: 0.4; cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0.25rem; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.delete-task-btn:hover { opacity: 1; background-color: var(--column-bg); }
+
+
+/* --- 4. ENHANCED Task Form --- */
+.task-form-container { padding: 2rem 2rem 0 2rem; }
+#add-task-form { display: flex; gap: 1rem; align-items: center; }
+
+.input-with-icon {
+    position: relative;
+    flex-grow: 1;
+}
+.input-with-icon span {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    opacity: 0.5;
+}
+#task-title {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.8rem 0.8rem 0.8rem 40px; /* Left padding for icon */
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--text-color);
+}
+#task-title:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+.priority-dropdown-wrapper {
+    position: relative;
+}
+#task-priority {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.8rem 2rem 0.8rem 1rem;
+    border-radius: 10px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+.priority-dropdown-wrapper::after {
+    content: '▼';
+    font-size: 0.8rem;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-color);
+    opacity: 0.5;
+}
+
+.add-task-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+.add-task-btn:hover {
+    background-color: #2563eb;
+}
+.add-task-btn .plus-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+
+/* --- 5. ENHANCED Secret Vault Modal & Footer --- */
+#app-footer { text-align: center; padding: 1.5rem; font-size: 0.8rem; opacity: 0.7; margin-top: auto; color: white;}
+.modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+
+.modal-content.vault-style {
+    background: #1e1e1e;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+}
+.vault-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.lock-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--accent-color);
+}
+#vault-password-display {
+    background: #111;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 1.5rem;
+    color: #0f0;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    letter-spacing: 0.5em;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+.file-upload-area {
+    border: 2px dashed #555;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+}
+.file-upload-area p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+#vault-file-input {
+    display: none;
+}
+.modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+.vault-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.vault-btn.primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+.vault-btn.primary:hover {
+    background-color: #2563eb;
+}
+.vault-btn.secondary {
+    background-color: #444;
+    color: #f0f0f0;
+}
+.vault-btn.secondary:hover {
+    background-color: #555;
+}

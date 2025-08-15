@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaulto-do</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- Focus Window Login & Sign Up -->
+    <div id="focus-login-container">
+        <div id="login-window">
+            <button id="unlock-button">Unlock Your Workspace</button>
+            <div id="login-form-wrapper" class="collapsed">
+                
+                <!-- Sign In View -->
+                <div id="signin-view">
+                    <h2>Secure Sign In</h2>
+                    <form id="signin-form">
+                        <p id="signin-message" class="message"></p>
+                        <div class="input-container">
+                            <input type="email" id="signin-email" placeholder="Email Address" required>
+                        </div>
+                        <div class="input-container">
+                            <input type="password" id="signin-password" placeholder="Password" required>
+                        </div>
+                        <button type="submit">Sign In</button>
+                    </form>
+                    <p class="toggle-link">First time here? <a href="#" id="show-signup">Create an account</a></p>
+                </div>
+
+                <!-- Sign Up View (Initially Hidden) -->
+                <div id="signup-view" class="hidden">
+                    <h2>Create Account</h2>
+                    <form id="signup-form">
+                        <p id="signup-message" class="message"></p>
+                        <div class="input-container">
+                            <input type="email" id="signup-email" placeholder="Email Address" required>
+                        </div>
+                        <div class="input-container">
+                            <input type="password" id="signup-password" placeholder="Password" required>
+                        </div>
+                        <button type="submit">Register</button>
+                    </form>
+                    <p class="toggle-link">Already have an account? <a href="#" id="show-signin">Sign In</a></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application Layout (hidden by default) -->
+    <div id="app-layout" class="hidden">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h1 id="logo">Vaulto-do</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#">Dashboard</a></li>
+                    <li><a href="#">Projects</a></li>
+                    <li><a href="#">Team</a></li>
+                    <li><a href="#">Analytics</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main id="main-content">
+            <header>
+                <button id="menu-toggle">☰</button>
+                <div class="controls">
+                    <button id="theme-toggle">🌓</button>
+                    <button id="signout-button">Sign Out</button>
+                </div>
+            </header>
+            
+            <div id="dashboard">
+                <!-- MODIFIED: Task Form Container -->
+                <section class="task-form-container">
+                    <form id="add-task-form">
+                        <div class="input-with-icon">
+                            <span>&#9998;</span> <!-- Pencil Icon -->
+                            <input type="text" id="task-title" placeholder="What's on your mind?" required>
+                        </div>
+                        <div class="priority-dropdown-wrapper">
+                             <select id="task-priority">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="add-task-btn">
+                            <span>Add Task</span>
+                            <span class="plus-icon">+</span>
+                        </button>
+                    </form>
+                </section>
+        
+                <section id="task-board" class="dashboard-container">
+                    <div class="task-column" id="To Do" ondragover="event.preventDefault()" ondrop="drop(event)">
+                        <h2>To Do</h2>
+                    </div>
+                    <div class="task-column" id="In Progress" ondragover="event.preventDefault()" ondrop="drop(event)">
+                        <h2>In Progress</h2>
+                    </div>
+                    <div class="task-column" id="Done" ondragover="event.preventDefault()" ondrop="drop(event)">
+                        <h2>Done</h2>
+                    </div>
+                </section>
+            </div>
+            
+            <footer id="app-footer">
+                &copy; <span id="copyright-year"></span> Vaulto-do. All Rights Reserved.
+            </footer>
+        </main>
+    </div>
+
+    <!-- MODIFIED: Secret Vault Modal -->
+    <div id="vault-modal" class="modal-backdrop hidden">
+        <div class="modal-content vault-style">
+            <div class="vault-header">
+                <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"></path></svg>
+                <h3>Secret Vault</h3>
+            </div>
+            <p>Enter your master password to unlock.</p>
+            <input type="password" id="vault-password-display" placeholder="••••••••" readonly>
+            
+            <div class="file-upload-area">
+                <p>Upload a file </p>
+                <input type="file" id="vault-file-input">
+            </div>
+            
+            <div class="modal-actions">
+                <button id="close-vault-modal" class="vault-btn secondary">Cancel</button>
+                <button class="vault-btn primary">Unlock</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
