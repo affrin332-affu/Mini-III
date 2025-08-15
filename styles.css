@@ -6,9 +6,20 @@
     --card-bg: #ffffff;
     --border-color: #e0e0e0;
     --shadow-color: rgba(0, 0, 0, 0.05);
-    --accent-color: #3b82f6;
+    --accent-color: #3b82f6; /* Blue for primary actions/accents */
     --sidebar-width: 240px;
     --glass-bg: rgba(255, 255, 255, 0.5); 
+
+    /* New/Updated variables for consistent styling */
+    --primary-button-bg: var(--accent-color);
+    --primary-button-hover-bg: #2563eb;
+    --secondary-button-bg: #e2e8f0;
+    --secondary-button-hover-bg: #cbd5e1;
+    --modal-bg-light: #ffffff;
+    --modal-bg-dark: #2c2c2c; /* Dark background for modals */
+    --high-priority-color: #ef4444; /* Red */
+    --medium-priority-color: #f59e0b; /* Orange */
+    --low-priority-color: #10b981; /* Green */
 }
 
 body.dark-mode {
@@ -17,19 +28,28 @@ body.dark-mode {
     --column-bg: #2c2c2c;
     --card-bg: #333333;
     --border-color: #444444;
+    --shadow-color: rgba(0, 0, 0, 0.2);
     --glass-bg: rgba(30, 30, 30, 0.5);
+
+    --primary-button-bg: var(--accent-color);
+    --primary-button-hover-bg: #2563eb;
+    --secondary-button-bg: #444;
+    --secondary-button-hover-bg: #555;
+    --modal-bg-dark: #1e1e1e; /* Ensure dark modal BG is distinct */
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: var(--text-color);
     margin: 0;
+    min-height: 100vh; /* Ensure body takes full height for positioning */
     
     /* Set your desired background image */
     background-image: url('images/background1.jpeg'); /* Make sure you have this image */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth dark mode transition */
 }
 
 /* Optional: background overlay for readability */
@@ -43,8 +63,9 @@ body::before {
 }
 
 .hidden { display: none !important; }
-.message { min-height: 20px; font-weight: 500; color: white; }
-
+.message { min-height: 20px; font-weight: 500; }
+.message.success { color: #10b981; } /* Green for success */
+.message.error { color: #ef4444; } /* Red for error */
 
 /* --- 2. Focus Window Login Page Styles --- */
 #focus-login-container {
@@ -134,6 +155,7 @@ body::before {
 }
 
 /* Sign-up container styles (now hidden, but kept for reference) */
+/* This block is likely unused if signup is integrated into login-form-wrapper */
 #signup-container { 
     position: absolute;
     top: 50%;
@@ -148,7 +170,7 @@ body::before {
     z-index: 10;
 }
 #signup-container form { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
-#signup-container input { padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--bg-color); color: var(--text-color); font-size: 1rem; }
+#signup-container input { padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--column-bg); color: var(--text-color); font-size: 1rem; }
 #signup-container button { padding: 0.75rem; border: none; border-radius: 6px; background-color: var(--accent-color); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
 #signup-container hr { border: none; border-top: 1px solid var(--border-color); margin: 2rem 0; }
 #signup-container a { color: var(--accent-color); text-decoration: none; }
@@ -175,8 +197,10 @@ body::before {
 .sidebar-nav li.active a { background-color: var(--accent-color); color: white; font-weight: 500; }
 
 #main-content {
-    flex-grow: 1; display: flex;
-    flex-direction: column; overflow: hidden;
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column; 
+    overflow: hidden; /* Prevent main content from overflowing */
 }
 
 header {
@@ -185,41 +209,139 @@ header {
     -webkit-backdrop-filter: blur(12px);
     display: flex; justify-content: space-between; align-items: center;
     padding: 1rem 2rem; border-bottom: 1px solid var(--border-color); flex-shrink: 0;
+    gap: 1rem; /* Added gap for elements in header */
 }
 #menu-toggle { font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--text-color); }
 header .controls { display: flex; gap: 1rem; }
-header .controls button { background: none; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; font-size: 1.25rem; cursor: pointer; line-height: 1; }
+header .controls button { 
+    background: none; 
+    border: 1px solid var(--border-color); 
+    border-radius: 6px; 
+    padding: 0.5rem; 
+    font-size: 1.25rem; 
+    cursor: pointer; 
+    line-height: 1; 
+    color: var(--text-color); /* Ensure icon color matches theme */
+    transition: background-color 0.2s, border-color 0.2s;
+}
+header .controls button:hover {
+    background-color: var(--column-bg);
+    border-color: var(--accent-color);
+}
 #signout-button { padding: 0.5rem 1rem; font-size: 1rem; }
 
-#dashboard { overflow: auto; }
+#dashboard { 
+    overflow: auto; 
+    flex-grow: 1; /* Allow dashboard to take remaining space */
+    display: flex; /* Make dashboard itself a flex container */
+    flex-direction: column; /* Stack sections vertically */
+}
 
-.dashboard-container { display: flex; gap: 1.5rem; padding: 2rem; }
+.dashboard-container { 
+    display: flex; 
+    gap: 1.5rem; 
+    padding: 2rem; 
+    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
+    flex-grow: 1; /* Allow task board to take remaining space */
+    align-items: flex-start; /* Align columns to the top */
+}
+
 .task-column {
     background-color: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-radius: 12px; padding: 1rem;
-    width: 320px; flex-shrink: 0; min-height: 300px;
+    border-radius: 12px; 
+    padding: 1rem;
+    width: 320px; /* Fixed width for columns */
+    flex-shrink: 0; 
+    min-height: 300px;
+    box-shadow: 0 4px 8px var(--shadow-color); /* Added shadow to columns */
+    display: flex; /* Make column a flex container */
+    flex-direction: column; /* Stack items vertically */
 }
-.task-column h2 { font-size: 1.1rem; margin-top: 0; padding-bottom: 1rem; }
-.task-card { background-color: var(--card-bg); border-radius: 6px; padding: 1rem; margin-top: 1rem; box-shadow: 0 2px 4px var(--shadow-color); border-left: 4px solid transparent; cursor: grab; position: relative; }
-.task-card p { margin: 0; }
+.task-column h2 { 
+    font-size: 1.1rem; 
+    margin-top: 0; 
+    padding-bottom: 1rem; 
+    border-bottom: 1px solid var(--border-color); /* Separator for column title */
+    margin-bottom: 1rem; /* Space after separator */
+}
+.task-card { 
+    background-color: var(--card-bg); 
+    border-radius: 6px; 
+    padding: 1rem; 
+    margin-top: 0.5rem; /* Reduced top margin for cards */
+    box-shadow: 0 2px 4px var(--shadow-color); 
+    border-left: 4px solid transparent; 
+    cursor: grab; 
+    position: relative; 
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+}
+.task-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.task-card h3 {
+    margin: 0 0 0.5rem 0; /* Space below title */
+    font-size: 1rem;
+    font-weight: 600;
+}
+.task-card p { margin: 0.25rem 0; font-size: 0.85rem; opacity: 0.8; }
 .task-card.dragging { opacity: 0.5; }
-.priority-high { border-left-color: #ef4444; }
-.priority-medium { border-left-color: #f59e0b; }
-.priority-low { border-left-color: #10b981; }
+.priority-high { border-left-color: var(--high-priority-color); }
+.priority-medium { border-left-color: var(--medium-priority-color); }
+.priority-low { border-left-color: var(--low-priority-color); }
 
-.delete-task-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--text-color); opacity: 0.4; cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0.25rem; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-.delete-task-btn:hover { opacity: 1; background-color: var(--column-bg); }
+.delete-task-btn { 
+    position: absolute; 
+    top: 8px; 
+    right: 8px; 
+    background: none; 
+    border: none; 
+    color: var(--text-color); 
+    opacity: 0.4; 
+    cursor: pointer; 
+    font-size: 1.2rem; 
+    line-height: 1; 
+    padding: 0.25rem; 
+    border-radius: 50%; 
+    width: 24px; 
+    height: 24px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: opacity 0.2s, background-color 0.2s, transform 0.2s;
+}
+.delete-task-btn:hover { 
+    opacity: 1; 
+    background-color: var(--column-bg); 
+    transform: scale(1.1);
+}
 
 
 /* --- 4. ENHANCED Task Form --- */
-.task-form-container { padding: 2rem 2rem 0 2rem; }
-#add-task-form { display: flex; gap: 1rem; align-items: center; }
+.task-form-container { 
+    padding: 2rem 2rem 0 2rem; 
+    background-color: var(--glass-bg); /* Use glass effect for form container */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem; /* Space between form and board */
+    border-radius: 12px; /* Match other rounded elements */
+    margin: 1.5rem 2rem 0; /* Adjust margin to match other sections */
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+#add-task-form { 
+    display: flex; 
+    gap: 1rem; 
+    align-items: center; 
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
 
 .input-with-icon {
     position: relative;
     flex-grow: 1;
+    min-width: 200px; /* Ensure input has enough space */
 }
 .input-with-icon span {
     position: absolute;
@@ -238,6 +360,7 @@ header .controls button { background: none; border: 1px solid var(--border-color
     width: 100%;
     box-sizing: border-box;
     color: var(--text-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 #task-title:focus {
     outline: none;
@@ -258,6 +381,13 @@ header .controls button { background: none; border: 1px solid var(--border-color
     border-radius: 10px;
     color: var(--text-color);
     cursor: pointer;
+    min-width: 120px; /* Ensure dropdown has enough space */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+#task-priority:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
 .priority-dropdown-wrapper::after {
     content: '▼';
@@ -271,8 +401,32 @@ header .controls button { background: none; border: 1px solid var(--border-color
     opacity: 0.5;
 }
 
+.date-input-wrapper { /* Style for the due date input container */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    min-width: 200px;
+}
+.date-input-wrapper label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+#task-due-date {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    outline: none;
+    flex-grow: 1;
+}
+
 .add-task-btn {
-    background-color: var(--accent-color);
+    background-color: var(--primary-button-bg);
     color: white;
     border: none;
     border-radius: 10px;
@@ -286,20 +440,237 @@ header .controls button { background: none; border: 1px solid var(--border-color
     transition: background-color 0.2s;
 }
 .add-task-btn:hover {
-    background-color: #2563eb;
+    background-color: var(--primary-button-hover-bg);
 }
 .add-task-btn .plus-icon {
     font-size: 1.5rem;
     line-height: 1;
 }
 
+/* --- NEW: Search Bar Styles --- */
+.search-container {
+    flex-grow: 1; /* Allows search bar to take available space */
+    margin: 0 1rem; /* Adjust margin if needed */
+}
+
+#task-search {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    background-color: var(--card-bg); /* Match card background */
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+#task-search:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* --- NEW: Pomodoro Timer Styles --- */
+#pomodoro-timer {
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    padding: 1.5rem;
+    text-align: center;
+    margin: 1.5rem 2rem 0rem; /* Adjusted margin */
+}
+
+#pomodoro-timer h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    color: var(--text-color);
+}
+
+.timer-display {
+    font-family: 'Share Tech Mono', monospace; /* A digital-looking font */
+    font-size: 4rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin: 1rem 0 1.5rem;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); /* Subtle glow */
+    transition: color 0.3s ease;
+}
+
+.timer-controls button {
+    background-color: var(--primary-button-bg);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    margin: 0 0.5rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.timer-controls button:hover {
+    background-color: var(--primary-button-hover-bg);
+    transform: translateY(-2px);
+}
+
+/* --- NEW: Task Details Modal Styles --- */
+/* This reuses and overrides the general .modal-backdrop and .modal-content */
+#task-details-modal .modal-content {
+    background-color: var(--modal-bg-light);
+    color: var(--text-color);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+    max-width: 550px;
+    width: 90%;
+    position: relative;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+body.dark-mode #task-details-modal .modal-content {
+    background-color: var(--modal-bg-dark);
+}
+
+#task-details-modal .modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+#task-details-modal h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--accent-color);
+    word-wrap: break-word; /* Prevent long titles from overflowing */
+}
+
+.detail-item {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.detail-item strong {
+    display: block; /* Ensures strong is on its own line */
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+#modal-task-description {
+    width: 100%;
+    height: 120px;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg); /* Match other inputs */
+    color: var(--text-color);
+    resize: vertical; /* Allow vertical resizing */
+    font-family: inherit;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#modal-task-description:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+#save-task-details-btn {
+    background-color: var(--primary-button-bg);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    float: right; /* Align to the right */
+}
+
+#save-task-details-btn:hover {
+    background-color: var(--primary-button-hover-bg);
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.8rem;
+    color: var(--text-color);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.close-button:hover {
+    color: var(--accent-color);
+    transform: rotate(90deg);
+}
 
 /* --- 5. ENHANCED Secret Vault Modal & Footer --- */
-#app-footer { text-align: center; padding: 1.5rem; font-size: 0.8rem; opacity: 0.7; margin-top: auto; color: white;}
-.modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+#app-footer { 
+    text-align: center; 
+    padding: 1.5rem; 
+    font-size: 0.8rem; 
+    opacity: 0.7; 
+    margin-top: auto; 
+    color: white;
+    background-color: rgba(0, 0, 0, 0.2); /* Slightly darker background for footer */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
 
+/* General modal backdrop and content styles, applied to both task details and vault */
+.modal-backdrop { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.6); /* Darker overlay for modals */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000; 
+    transition: opacity 0.3s ease;
+    opacity: 1; /* Default to visible for this example, hidden by JS */
+}
+.modal-backdrop.hidden {
+    opacity: 0;
+    pointer-events: none; /* Make it unclickable when hidden */
+}
+
+.modal-content {
+    background-color: var(--modal-bg-light); /* Default for light mode */
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2);
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    transform: translateY(0); /* Default to visible for this example, adjusted by JS */
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+body.dark-mode .modal-content {
+    background-color: var(--modal-bg-dark);
+}
+
+/* Specific Vault Modal Styles (overrides general modal-content) */
 .modal-content.vault-style {
-    background: #1e1e1e;
+    background: #1e1e1e; /* Specific dark background for vault */
     color: #f0f0f0;
     border: 1px solid #444;
     border-radius: 15px;
@@ -327,10 +698,10 @@ header .controls button { background: none; border: 1px solid var(--border-color
     border-radius: 8px;
     padding: 0.75rem;
     font-size: 1.5rem;
-    color: #0f0;
+    color: #0f0; /* Green text for a "secret" look */
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
-    letter-spacing: 0.5em;
+    letter-spacing: 0.5em; /* Spaced out characters */
     margin-bottom: 1.5rem;
     width: 100%;
     box-sizing: border-box;
@@ -341,6 +712,11 @@ header .controls button { background: none; border: 1px solid var(--border-color
     padding: 1rem;
     margin-bottom: 1.5rem;
     cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.file-upload-area:hover {
+    border-color: var(--accent-color);
+    background-color: rgba(59, 130, 246, 0.1);
 }
 .file-upload-area p {
     margin: 0 0 0.5rem 0;
@@ -348,7 +724,7 @@ header .controls button { background: none; border: 1px solid var(--border-color
     opacity: 0.7;
 }
 #vault-file-input {
-    display: none;
+    display: none; /* Hide native file input */
 }
 .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
 .vault-btn {
@@ -360,16 +736,78 @@ header .controls button { background: none; border: 1px solid var(--border-color
     transition: all 0.2s;
 }
 .vault-btn.primary {
-    background-color: var(--accent-color);
+    background-color: var(--primary-button-bg);
     color: white;
 }
 .vault-btn.primary:hover {
-    background-color: #2563eb;
+    background-color: var(--primary-button-hover-bg);
 }
 .vault-btn.secondary {
+    background-color: var(--secondary-button-bg); /* Use new variable */
+    color: var(--text-color); /* Match theme text color */
+}
+body.dark-mode .vault-btn.secondary {
     background-color: #444;
     color: #f0f0f0;
 }
 .vault-btn.secondary:hover {
-    background-color: #555;
+    background-color: var(--secondary-button-hover-bg);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        height: 100vh;
+        z-index: 900;
+        margin-left: calc(-1 * var(--sidebar-width)); /* Ensure it's off-screen by default */
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    }
+    #sidebar.collapsed {
+        margin-left: calc(-1 * var(--sidebar-width));
+    }
+    #sidebar.expanded { /* Add a class to expand sidebar on smaller screens */
+        margin-left: 0;
+    }
+    #menu-toggle {
+        display: block; /* Show menu toggle on small screens */
+    }
+    header {
+        justify-content: flex-start; /* Adjust alignment for smaller screens */
+        gap: 0.5rem;
+    }
+    .search-container {
+        margin: 0 0.5rem;
+    }
+    .dashboard-container {
+        flex-direction: column; /* Stack columns vertically */
+        align-items: center; /* Center columns */
+        padding: 1rem;
+        gap: 1rem;
+    }
+    .task-column {
+        width: 100%; /* Full width for columns */
+        max-width: 400px; /* Constrain max width for readability */
+    }
+    #add-task-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+    }
+    .input-with-icon, .priority-dropdown-wrapper, .date-input-wrapper {
+        width: 100%;
+        min-width: unset;
+    }
+    #add-task-form .add-task-btn {
+        width: 100%;
+    }
+    #pomodoro-timer {
+        margin: 1rem;
+    }
+    #task-details-modal .modal-content, .modal-content.vault-style {
+        padding: 1.5rem;
+    }
+    #task-details-modal h3 {
+        font-size: 1.5rem;
+    }
 }

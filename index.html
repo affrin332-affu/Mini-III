@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vaulto-do</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- REMOVED: <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
 </head>
 <body>
 
@@ -28,6 +28,8 @@
                         </div>
                         <button type="submit">Sign In</button>
                     </form>
+                    <!-- NEW: Forgot Password link -->
+                    <p class="toggle-link"><a href="#" id="show-forgot-password">Forgot password?</a></p>
                     <p class="toggle-link">First time here? <a href="#" id="show-signup">Create an account</a></p>
                 </div>
 
@@ -47,7 +49,20 @@
                     <p class="toggle-link">Already have an account? <a href="#" id="show-signin">Sign In</a></p>
                 </div>
 
-            </div>
+                <!-- NEW: Forgot Password View (Initially Hidden) -->
+                <div id="forgot-password-view" class="hidden">
+                    <h2>Reset Password</h2>
+                    <form id="forgot-password-form">
+                        <p id="forgot-password-message" class="message"></p>
+                        <div class="input-container">
+                            <input type="email" id="forgot-password-email" placeholder="Enter your email" required>
+                        </div>
+                        <button type="submit">Send Reset Link</button>
+                    </form>
+                    <p class="toggle-link"><a href="#" id="back-to-signin">Back to Sign In</a></p>
+                </div>
+
+            </div> 
         </div>
     </div>
 
@@ -71,6 +86,10 @@
         <main id="main-content">
             <header>
                 <button id="menu-toggle">☰</button>
+                <!-- NEW: Search Bar -->
+                <div class="search-container">
+                    <input type="text" id="task-search" placeholder="Search tasks...">
+                </div>
                 <div class="controls">
                     <button id="theme-toggle">🌓</button>
                     <button id="signout-button">Sign Out</button>
@@ -78,7 +97,20 @@
             </header>
             
             <div id="dashboard">
-                <!-- MODIFIED: Task Form Container -->
+                <!-- NEW: Pomodoro Timer -->
+                <section id="pomodoro-timer" class="dashboard-widget">
+                    <h2>Pomodoro Timer</h2>
+                    <div class="timer-display">
+                        <span id="timer-minutes">25</span>:<span id="timer-seconds">00</span>
+                    </div>
+                    <div class="timer-controls">
+                        <button id="timer-start">Start</button>
+                        <button id="timer-pause">Pause</button>
+                        <button id="timer-reset">Reset</button>
+                    </div>
+                </section>
+
+                <!-- MODIFIED: Task Form Container (with Due Date) -->
                 <section class="task-form-container">
                     <form id="add-task-form">
                         <div class="input-with-icon">
@@ -86,11 +118,15 @@
                             <input type="text" id="task-title" placeholder="What's on your mind?" required>
                         </div>
                         <div class="priority-dropdown-wrapper">
-                             <select id="task-priority">
+                            <select id="task-priority">
                                 <option value="Low">Low</option>
                                 <option value="Medium" selected>Medium</option>
                                 <option value="High">High</option>
                             </select>
+                        </div>
+                        <div class="date-input-wrapper">
+                            <label for="task-due-date">Due Date:</label>
+                            <input type="date" id="task-due-date">
                         </div>
                         <button type="submit" class="add-task-btn">
                             <span>Add Task</span>
@@ -118,7 +154,38 @@
         </main>
     </div>
 
-    <!-- MODIFIED: Secret Vault Modal -->
+    <!-- NEW: Task Details Modal -->
+    <div id="task-details-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-header">
+                <h3 id="modal-task-title"></h3>
+            </div>
+            <div class="modal-body">
+                <div class="detail-item">
+                    <strong>Status:</strong> <span id="modal-task-status"></span>
+                </div>
+                <div class="detail-item">
+                    <strong>Priority:</strong> <span id="modal-task-priority"></span>
+                </div>
+                <div class="detail-item">
+                    <strong>Due Date:</strong> <span id="modal-task-due-date"></span>
+                </div>
+                <div class="detail-item">
+                    <strong>Created At:</strong> <span id="modal-task-created-at"></span>
+                </div>
+                <div class="detail-item">
+                    <strong>Description:</strong>
+                    <textarea id="modal-task-description" placeholder="Add a description..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="save-task-details-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secret Vault Modal -->
     <div id="vault-modal" class="modal-backdrop hidden">
         <div class="modal-content vault-style">
             <div class="vault-header">
