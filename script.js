@@ -1,8 +1,4 @@
-// Remove Supabase import from HTML and here
-// You should also remove the <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-// line from your index.html file's <head> section.
-
-// Base URL for your backend API - CORRECTED PORT TO 5501
+// Base URL for your backend API
 const API_BASE_URL = 'http://localhost:5501/api';
 
 // --- DOM Elements ---
@@ -15,22 +11,22 @@ const appLayout = document.getElementById('app-layout');
 // Views within the Focus Window
 const signinView = document.getElementById('signin-view');
 const signupView = document.getElementById('signup-view');
-const forgotPasswordView = document.getElementById('forgot-password-view'); // NEW
+const forgotPasswordView = document.getElementById('forgot-password-view');
 
 // Messages
 const signinMessage = document.getElementById('signin-message');
 const signupMessage = document.getElementById('signup-message');
-const forgotPasswordMessage = document.getElementById('forgot-password-message'); // NEW
+const forgotPasswordMessage = document.getElementById('forgot-password-message');
 
 // Forms and Links
 const signinForm = document.getElementById('signin-form');
 const signupForm = document.getElementById('signup-form');
-const forgotPasswordForm = document.getElementById('forgot-password-form'); // NEW
+const forgotPasswordForm = document.getElementById('forgot-password-form');
 
 const showSignup = document.getElementById('show-signup');
 const showSignin = document.getElementById('show-signin');
-const showForgotPasswordLink = document.getElementById('show-forgot-password'); // NEW
-const backToSigninLink = document.getElementById('back-to-signin'); // NEW
+const showForgotPasswordLink = document.getElementById('show-forgot-password');
+const backToSigninLink = document.getElementById('back-to-signin');
 
 // Main App Elements
 const signoutButton = document.getElementById('signout-button');
@@ -43,16 +39,21 @@ const themeToggle = document.getElementById('theme-toggle');
 const menuToggle = document.getElementById('menu-toggle');
 const sidebar = document.getElementById('sidebar');
 const copyrightYear = document.getElementById('copyright-year');
-const taskSearchInput = document.getElementById('task-search'); // Added for search
+const taskSearchInput = document.getElementById('task-search');
 
-// Pomodoro Timer elements
-const timerMinutesDisplay = document.getElementById('timer-minutes');
-const timerSecondsDisplay = document.getElementById('timer-seconds');
-const timerStartBtn = document.getElementById('timer-start');
-const timerPauseBtn = document.getElementById('timer-pause');
-const timerResetBtn = document.getElementById('timer-reset');
-let pomodoroInterval;
-let timerTime = 25 * 60; // 25 minutes default
+// Sidebar navigation links
+const dashboardLink = document.getElementById('dashboard-link');
+const adminPanelLink = document.getElementById('admin-panel-link');
+const showAdminPanelBtn = document.getElementById('show-admin-panel');
+
+// Main content sections
+const dashboardSection = document.getElementById('dashboard');
+const adminDashboardSection = document.getElementById('admin-dashboard-section');
+
+// Admin Dashboard elements
+const adminUsersList = document.getElementById('admin-users-list');
+const adminAllTasksList = document.getElementById('admin-all-tasks-list');
+
 
 // Task Details Modal elements
 const taskDetailsModal = document.getElementById('task-details-modal');
@@ -66,7 +67,32 @@ const modalTaskDescription = document.getElementById('modal-task-description');
 const saveTaskDetailsBtn = document.getElementById('save-task-details-btn');
 let currentTaskToEdit = null;
 
+// Generic Modal elements (for alerts and confirmations)
+const genericModal = document.getElementById('generic-modal');
+const genericModalTitle = document.getElementById('generic-modal-title');
+const genericModalMessage = document.getElementById('generic-modal-message');
+const genericModalActions = document.getElementById('generic-modal-actions');
+const genericModalCloseBtn = document.getElementById('generic-modal-close-btn');
+
+// Global variable to store user role
+let currentUserRole = 'user'; // Default to user
+
 // --- Helper Functions ---
+
+// Function to decode JWT token
+function decodeJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error('Error decoding JWT:', error);
+        return null;
+    }
+}
 
 // Displays a message on the UI (e.g., login errors, success messages)
 function displayMessage(element, message, type) {
@@ -92,6 +118,10 @@ function showLogin() {
     displayMessage(signinMessage, '', ''); // Clear messages
     displayMessage(signupMessage, '', '');
     displayMessage(forgotPasswordMessage, '', ''); // Clear forgot password messages
+
+    // Hide admin link on logout
+    adminPanelLink.classList.add('hidden');
+    currentUserRole = 'user'; // Reset role
 }
 
 // Shows the main application dashboard
@@ -102,14 +132,74 @@ function showApp() {
     loginWindow.classList.remove('success');
 }
 
+/**
+ * Shows a generic modal for alerts or confirmations.
+ * @param {string} title - The title for the modal.
+ * @param {string} message - The message content for the modal.
+ * @param {Array<Object>} buttonsConfig - An array of button configurations.
+ * Each object: { text: string, className: string, onClick: Function }
+ * @param {Function} onCloseCallback - Optional callback when the modal is closed without button interaction.
+ */
+function showGenericModal(title, message, buttonsConfig = [], onCloseCallback = () => {}) {
+    genericModalTitle.textContent = title;
+    genericModalMessage.textContent = message;
+    genericModalActions.innerHTML = ''; // Clear existing buttons
+
+    buttonsConfig.forEach(btn => {
+        const button = document.createElement('button');
+        button.textContent = btn.text;
+        button.className = btn.className; // e.g., 'vault-btn primary', 'vault-btn secondary'
+        button.onclick = () => {
+            hideGenericModal();
+            if (btn.onClick) {
+                btn.onClick();
+            }
+        };
+        genericModalActions.appendChild(button);
+    });
+
+    genericModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+
+    // Store the callback for closing via 'x' button or backdrop click
+    genericModal.onCloseCallback = onCloseCallback;
+}
+
+function hideGenericModal() {
+    genericModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+    if (genericModal.onCloseCallback) {
+        genericModal.onCloseCallback();
+        genericModal.onCloseCallback = null; // Clear callback
+    }
+}
+
+// Event listeners for generic modal close button and backdrop
+genericModalCloseBtn.addEventListener('click', hideGenericModal);
+genericModal.addEventListener('click', (e) => {
+    if (e.target === genericModal) {
+        hideGenericModal();
+    }
+});
+
+
 // --- 2. AUTHENTICATION LOGIC (MongoDB Backend) ---
 
 // Checks if a user token exists in localStorage to determine login state
-function checkAuthStatus() {
+async function checkAuthStatus() {
     const token = localStorage.getItem('userToken');
     if (token) {
+        const decodedToken = decodeJwt(token);
+        if (decodedToken && decodedToken.role) {
+            currentUserRole = decodedToken.role;
+            if (currentUserRole === 'admin') {
+                adminPanelLink.classList.remove('hidden');
+            } else {
+                adminPanelLink.classList.add('hidden');
+            }
+        }
         showApp();
-        fetchTasks(); // Load tasks if authenticated
+        fetchTasks(); // Load tasks for regular users
     } else {
         showLogin();
     }
@@ -166,6 +256,16 @@ signinForm.addEventListener('submit', async (e) => {
 
         if (response.ok) {
             localStorage.setItem('userToken', data.token); // Store the JWT token
+            const decodedToken = decodeJwt(data.token);
+            if (decodedToken && decodedToken.role) {
+                currentUserRole = decodedToken.role;
+                if (currentUserRole === 'admin') {
+                    adminPanelLink.classList.remove('hidden');
+                } else {
+                    adminPanelLink.classList.add('hidden');
+                }
+            }
+
             loginWindow.classList.add('success'); // Visual feedback for successful login
             setTimeout(() => {
                 showApp();
@@ -180,7 +280,7 @@ signinForm.addEventListener('submit', async (e) => {
     }
 });
 
-// NEW: Handles forgot password request
+// Handles forgot password request
 forgotPasswordForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     displayMessage(forgotPasswordMessage, 'Sending reset link...', '');
@@ -217,9 +317,14 @@ signoutButton.addEventListener('click', () => {
     document.querySelectorAll('.task-column').forEach(col => {
         col.querySelectorAll('.task-card').forEach(card => card.remove());
     });
+    // Hide admin section if it was visible
+    dashboardSection.classList.remove('hidden');
+    adminDashboardSection.classList.add('hidden');
+    adminPanelLink.classList.add('hidden'); // Ensure admin link is hidden
+    currentUserRole = 'user'; // Reset role on signout
 });
 
-// --- Auth View Toggling (NEW/MODIFIED) ---
+// --- Auth View Toggling ---
 showSignup.addEventListener('click', (e) => {
     e.preventDefault();
     displayMessage(signupMessage, '', ''); // Clear messages
@@ -236,7 +341,7 @@ showSignin.addEventListener('click', (e) => {
     signinView.classList.remove('hidden');
 });
 
-showForgotPasswordLink.addEventListener('click', (e) => { // NEW
+showForgotPasswordLink.addEventListener('click', (e) => {
     e.preventDefault();
     displayMessage(forgotPasswordMessage, '', ''); // Clear messages
     signinView.classList.add('hidden');
@@ -244,7 +349,7 @@ showForgotPasswordLink.addEventListener('click', (e) => { // NEW
     forgotPasswordView.classList.remove('hidden');
 });
 
-backToSigninLink.addEventListener('click', (e) => { // NEW
+backToSigninLink.addEventListener('click', (e) => {
     e.preventDefault();
     displayMessage(signinMessage, '', ''); // Clear messages
     forgotPasswordView.classList.add('hidden');
@@ -359,6 +464,11 @@ addTaskForm.addEventListener('submit', async (e) => {
             fetchTasks();
         } catch (error) {
             console.error('Error adding task:', error);
+            showGenericModal(
+                "Error",
+                "Failed to add task. Please try again.",
+                [{ text: "OK", className: "vault-btn primary" }]
+            );
         }
     }
 });
@@ -367,25 +477,37 @@ addTaskForm.addEventListener('submit', async (e) => {
 taskBoard.addEventListener('click', async (e) => {
     if (e.target.classList.contains('delete-task-btn')) {
         const taskId = e.target.getAttribute('data-task-id');
-        // Replaced browser alert with a custom modal if needed, but keeping for now for simplicity.
-        if (confirm('Are you sure you want to delete this task?')) {
-            const token = localStorage.getItem('userToken');
-            if (!token) return;
+        
+        showGenericModal(
+            "Confirm Deletion",
+            "Are you sure you want to delete this task?",
+            [
+                { text: "Delete", className: "vault-btn primary", onClick: async () => {
+                    const token = localStorage.getItem('userToken');
+                    if (!token) return;
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                fetchTasks(); // Refresh tasks after deletion
-            } catch (error) {
-                console.error('Error deleting task:', error);
-            }
-        }
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        fetchTasks(); // Refresh tasks after deletion
+                    } catch (error) {
+                        console.error('Error deleting task:', error);
+                        showGenericModal(
+                            "Error",
+                            "Failed to delete task. Please try again.",
+                            [{ text: "OK", className: "vault-btn primary" }]
+                        );
+                    }
+                }},
+                { text: "Cancel", className: "vault-btn secondary" }
+            ]
+        );
     }
 });
 
@@ -447,6 +569,11 @@ window.drop = async (e) => {
             // fetchTasks();
         } catch (error) {
             console.error('Error updating task status:', error);
+            showGenericModal(
+                "Error",
+                "Failed to update task status. Please try again.",
+                [{ text: "OK", className: "vault-btn primary" }]
+            );
         }
     }
 };
@@ -470,7 +597,7 @@ menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
 });
 
-// --- NEW: Task Details Modal Logic ---
+// --- Task Details Modal Logic ---
 function showTaskDetailsModal(task) {
     currentTaskToEdit = task; // Store the task object being viewed/edited
     modalTaskTitle.textContent = task.title;
@@ -523,70 +650,356 @@ saveTaskDetailsBtn.addEventListener('click', async () => {
         } else {
             const errorData = await response.json();
             console.error('Error saving task details:', errorData.error);
-            alert('Failed to save task details: ' + (errorData.error || 'Unknown error'));
+            showGenericModal(
+                "Error",
+                "Failed to save task details: " + (errorData.error || 'Unknown error'),
+                [{ text: "OK", className: "vault-btn primary" }]
+            );
         }
     } catch (error) {
         console.error('Error in saveTaskDetails fetch:', error);
-        alert('An error occurred while saving task details.');
+        showGenericModal(
+            "Error",
+            "An error occurred while saving task details.",
+            [{ text: "OK", className: "vault-btn primary" }]
+        );
     }
 });
 
-// --- NEW: Pomodoro Timer Logic ---
-function updateTimerDisplay() {
-    const minutes = Math.floor(timerTime / 60);
-    const seconds = timerTime % 60;
-    timerMinutesDisplay.textContent = String(minutes).padStart(2, '0');
-    timerSecondsDisplay.textContent = String(seconds).padStart(2, '0');
+// --- ADMIN PANEL LOGIC ---
+
+// Function to show the admin dashboard and hide the regular dashboard
+function showAdminDashboard() {
+    dashboardSection.classList.add('hidden');
+    adminDashboardSection.classList.remove('hidden');
+    // Update active state in sidebar
+    dashboardLink.parentElement.classList.remove('active');
+    adminPanelLink.classList.add('active');
+    fetchAllUsers();
+    fetchAllTasksForAdmin(); // Fetch all tasks for admin view
 }
 
-function startTimer() {
-    if (pomodoroInterval) return; // Prevent multiple intervals
-    timerStartBtn.textContent = 'Continue';
-    pomodoroInterval = setInterval(() => {
-        if (timerTime > 0) {
-            timerTime--;
-            updateTimerDisplay();
-        } else {
-            clearInterval(pomodoroInterval);
-            pomodoroInterval = null;
-            // Using alert for simplicity, consider a custom modal for better UX
-            alert('Pomodoro session finished! Time for a break.');
-            resetTimer(); // Reset for next session
+// Function to show the regular dashboard and hide the admin dashboard
+function showRegularDashboard() {
+    adminDashboardSection.classList.add('hidden');
+    dashboardSection.classList.remove('hidden');
+    // Update active state in sidebar
+    adminPanelLink.classList.remove('active');
+    dashboardLink.parentElement.classList.add('active');
+    fetchTasks(); // Re-fetch tasks for regular user view
+}
+
+// Event listener for Admin Panel link
+showAdminPanelBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (currentUserRole === 'admin') {
+        showAdminDashboard();
+    } else {
+        showGenericModal("Access Denied", "You do not have administrative privileges.", [{ text: "OK", className: "vault-btn primary" }]);
+    }
+});
+
+// Event listener for Dashboard link
+dashboardLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showRegularDashboard();
+});
+
+
+// Fetches all users for admin view
+const fetchAllUsers = async () => {
+    const token = localStorage.getItem('userToken');
+    if (!token || currentUserRole !== 'admin') {
+        console.warn('Not authorized to fetch all users.');
+        adminUsersList.innerHTML = '<p class="placeholder-text">Access Denied: Admin privileges required.</p>';
+        return;
+    }
+
+    adminUsersList.innerHTML = '<p class="placeholder-text">Loading users...</p>'; // Show loading indicator
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                showGenericModal("Access Denied", "You do not have permission to view users.", [{ text: "OK", className: "vault-btn primary" }]);
+                adminUsersList.innerHTML = '<p class="placeholder-text">Access Denied: Admin privileges required.</p>';
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    }, 1000);
-}
 
-function pauseTimer() {
-    clearInterval(pomodoroInterval);
-    pomodoroInterval = null;
-    timerStartBtn.textContent = 'Start';
-}
+        const users = await response.json();
+        renderUsersForAdmin(users);
+    } catch (error) {
+        console.error('Error fetching all users:', error);
+        adminUsersList.innerHTML = '<p class="placeholder-text">Failed to load users.</p>';
+    }
+};
 
-function resetTimer() {
-    clearInterval(pomodoroInterval);
-    pomodoroInterval = null;
-    timerTime = 25 * 60; // Reset to 25 minutes
-    updateTimerDisplay();
-    timerStartBtn.textContent = 'Start';
-}
+// Renders users in the admin user list with role dropdown and save button
+const renderUsersForAdmin = (users) => {
+    adminUsersList.innerHTML = ''; // Clear existing list
+    if (users.length === 0) {
+        adminUsersList.innerHTML = '<p class="placeholder-text">No users found.</p>';
+        return;
+    }
 
-// Event listeners for Pomodoro Timer
-timerStartBtn.addEventListener('click', startTimer);
-timerPauseBtn.addEventListener('click', pauseTimer);
-timerResetBtn.addEventListener('click', resetTimer);
+    users.forEach(user => {
+        const userCard = document.createElement('div');
+        userCard.className = 'user-card task-card'; // Reusing task-card styling for consistency
+        userCard.innerHTML = `
+            <h3>${user.email}</h3>
+            <p>ID: ${user._id}</p>
+            <div class="user-role-control">
+                <label for="role-select-${user._id}">Role:</label>
+                <select id="role-select-${user._id}" class="role-select ${user.role === 'admin' ? 'role-admin' : 'role-user'}">
+                    <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                </select>
+                <button class="save-role-btn vault-btn primary" data-user-id="${user._id}" data-original-role="${user.role}">Save Role</button>
+            </div>
+            <div class="user-actions">
+                <button class="delete-user-btn" data-user-id="${user._id}" title="Delete User">Delete User</button>
+            </div>
+        `;
+        adminUsersList.appendChild(userCard);
 
-// --- 1. INITIALIZATION ---
+        // Add event listener for role select change to enable/disable save button
+        const roleSelect = userCard.querySelector(`#role-select-${user._id}`);
+        const saveRoleBtn = userCard.querySelector(`.save-role-btn`);
+
+        // Disable save button initially if no change
+        saveRoleBtn.disabled = true;
+
+        roleSelect.addEventListener('change', () => {
+            if (roleSelect.value !== saveRoleBtn.dataset.originalRole) {
+                saveRoleBtn.disabled = false; // Enable if role changed
+                roleSelect.classList.remove('role-user', 'role-admin');
+                roleSelect.classList.add(`role-${roleSelect.value}`);
+            } else {
+                saveRoleBtn.disabled = true; // Disable if reverted to original
+                roleSelect.classList.remove('role-user', 'role-admin');
+                roleSelect.classList.add(`role-${roleSelect.value}`);
+            }
+        });
+    });
+
+    // Add event listeners for delete user buttons
+    adminUsersList.querySelectorAll('.delete-user-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const userIdToDelete = e.target.dataset.userId;
+            showGenericModal(
+                "Confirm User Deletion",
+                `Are you sure you want to delete user: ${userIdToDelete}? This action cannot be undone.`,
+                [
+                    { text: "Delete User", className: "vault-btn primary", onClick: () => deleteUser(userIdToDelete) },
+                    { text: "Cancel", className: "vault-btn secondary" }
+                ]
+            );
+        });
+    });
+
+    // Add event listeners for save role buttons
+    adminUsersList.querySelectorAll('.save-role-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const userIdToUpdate = e.target.dataset.userId;
+            const newRole = userCard.querySelector(`#role-select-${userIdToUpdate}`).value; // Get selected value
+            showGenericModal(
+                "Confirm Role Change",
+                `Are you sure you want to change the role of ${userCard.querySelector('h3').textContent} to "${newRole}"?`,
+                [
+                    { text: "Change Role", className: "vault-btn primary", onClick: () => updateUserRole(userIdToUpdate, newRole) },
+                    { text: "Cancel", className: "vault-btn secondary" }
+                ]
+            );
+        });
+    });
+};
+
+// Updates a user's role (admin action)
+const updateUserRole = async (userId, newRole) => {
+    const token = localStorage.getItem('userToken');
+    if (!token || currentUserRole !== 'admin') {
+        showGenericModal("Access Denied", "You do not have permission to change user roles.", [{ text: "OK", className: "vault-btn primary" }]);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, { // New endpoint for role update
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ newRole })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        showGenericModal("Success", `User role updated to ${newRole}.`, [{ text: "OK", className: "vault-btn primary" }]);
+        fetchAllUsers(); // Refresh user list to reflect changes
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        showGenericModal("Error", `Failed to update user role: ${error.message}`, [{ text: "OK", className: "vault-btn primary" }]);
+    }
+};
+
+
+// Deletes a user (admin action)
+const deleteUser = async (userId) => {
+    const token = localStorage.getItem('userToken');
+    if (!token || currentUserRole !== 'admin') {
+        showGenericModal("Access Denied", "You do not have permission to delete users.", [{ text: "OK", className: "vault-btn primary" }]);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        showGenericModal("Success", "User deleted successfully.", [{ text: "OK", className: "vault-btn primary" }]);
+        fetchAllUsers(); // Refresh user list
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        showGenericModal("Error", `Failed to delete user: ${error.message}`, [{ text: "OK", className: "vault-btn primary" }]);
+    }
+};
+
+// Fetches all tasks for admin view (global tasks)
+const fetchAllTasksForAdmin = async () => {
+    const token = localStorage.getItem('userToken');
+    if (!token || currentUserRole !== 'admin') {
+        console.warn('Not authorized to fetch all tasks for admin.');
+        adminAllTasksList.innerHTML = '<p class="placeholder-text">Access Denied: Admin privileges required.</p>';
+        return;
+    }
+
+    adminAllTasksList.innerHTML = '<p class="placeholder-text">Loading all tasks...</p>'; // Show loading indicator
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/tasks`, { // Assuming a new admin endpoint for all tasks
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                showGenericModal("Access Denied", "You do not have permission to view all tasks.", [{ text: "OK", className: "vault-btn primary" }]);
+                adminAllTasksList.innerHTML = '<p class="placeholder-text">Access Denied: Admin privileges required.</p>';
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const tasks = await response.json();
+        renderAllTasksForAdmin(tasks);
+    } catch (error) {
+        console.error('Error fetching all tasks for admin:', error);
+        adminAllTasksList.innerHTML = '<p class="placeholder-text">Failed to load all tasks.</p>';
+    }
+};
+
+// Renders all tasks in the admin all tasks list
+const renderAllTasksForAdmin = (tasks) => {
+    adminAllTasksList.innerHTML = ''; // Clear existing list
+    if (tasks.length === 0) {
+        adminAllTasksList.innerHTML = '<p class="placeholder-text">No tasks found in the system.</p>';
+        return;
+    }
+
+    tasks.forEach(task => {
+        const taskCard = document.createElement('div');
+        taskCard.className = `task-card priority-${task.priority.toLowerCase()}`;
+        taskCard.id = `admin-task-${task._id}`; 
+        
+        const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No Due Date';
+
+        taskCard.innerHTML = `
+            <h3>${task.title}</h3>
+            <p>Status: ${task.status}</p>
+            <p>Priority: ${task.priority}</p>
+            <p>Due: ${dueDate}</p>
+            <p>Created by: ${task.userEmail || 'N/A'}</p> <!-- Assuming user email is returned by backend -->
+            <div class="task-actions">
+                <button class="delete-admin-task-btn" data-task-id="${task._id}" title="Delete Task">×</button>
+                <!-- Add edit functionality for admin to edit any task -->
+            </div>
+        `;
+        adminAllTasksList.appendChild(taskCard);
+    });
+
+    // Add event listeners for delete admin task buttons
+    adminAllTasksList.querySelectorAll('.delete-admin-task-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const taskIdToDelete = e.target.dataset.taskId;
+            showGenericModal(
+                "Confirm Task Deletion (Admin)",
+                `Are you sure you want to delete this task (ID: ${taskIdToDelete})? This will delete it for all users.`,
+                [
+                    { text: "Delete Task", className: "vault-btn primary", onClick: () => deleteAdminTask(taskIdToDelete) },
+                    { text: "Cancel", className: "vault-btn secondary" }
+                ]
+            );
+        });
+    });
+};
+
+// Deletes any task (admin action)
+const deleteAdminTask = async (taskId) => {
+    const token = localStorage.getItem('userToken');
+    if (!token || currentUserRole !== 'admin') {
+        showGenericModal("Access Denied", "You do not have permission to delete tasks globally.", [{ text: "OK", className: "vault-btn primary" }]);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/tasks/${taskId}`, { // Assuming a new admin endpoint for global task deletion
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        showGenericModal("Success", "Task deleted successfully from all users.", [{ text: "OK", className: "vault-btn primary" }]);
+        fetchAllTasksForAdmin(); // Refresh all tasks list
+    } catch (error) {
+        console.error('Error deleting admin task:', error);
+        showGenericModal("Error", `Failed to delete task: ${error.message}`, [{ text: "OK", className: "vault-btn primary" }]);
+    }
+};
+
+
+// --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     copyrightYear.textContent = new Date().getFullYear();
-    updateTimerDisplay(); // Initialize timer display
     checkAuthStatus(); // Check authentication state on page load
 
-    // THIS IS THE EVENT LISTENER FOR UNLOCK BUTTON!
-    // It should be here within DOMContentLoaded to ensure the button element exists
-    // before attempting to attach the listener.
-    unlockButton.addEventListener('click', () => {
-        console.log('Unlock button clicked! Attempting to expand form.'); 
-        loginWindow.classList.add('expanded');
-        loginFormWrapper.classList.remove('collapsed');
-    });
+    // Log to check if unlockButton is found
+    if (unlockButton) {
+        console.log('Unlock button element found:', unlockButton);
+        unlockButton.addEventListener('click', () => {
+            console.log('Unlock button clicked! Attempting to expand form.'); 
+            loginWindow.classList.add('expanded');
+            loginFormWrapper.classList.remove('collapsed');
+            console.log('loginWindow classes after click:', loginWindow.classList.value);
+            console.log('loginFormWrapper classes after click:', loginFormWrapper.classList.value);
+        });
+    } else {
+        console.error('Unlock button element not found!');
+    }
 });

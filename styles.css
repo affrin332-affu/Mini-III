@@ -20,6 +20,10 @@
     --high-priority-color: #ef4444; /* Red */
     --medium-priority-color: #f59e0b; /* Orange */
     --low-priority-color: #10b981; /* Green */
+
+    /* New role-specific colors */
+    --role-user-color: #6b7280; /* Gray */
+    --role-admin-color: var(--accent-color); /* Blue */
 }
 
 body.dark-mode {
@@ -36,6 +40,9 @@ body.dark-mode {
     --secondary-button-bg: #444;
     --secondary-button-hover-bg: #555;
     --modal-bg-dark: #1e1e1e; /* Ensure dark modal BG is distinct */
+
+    /* Dark mode adjustments for role colors */
+    --role-user-color: #9ca3af; /* Lighter gray for dark mode */
 }
 
 body {
@@ -230,20 +237,39 @@ header .controls button:hover {
 }
 #signout-button { padding: 0.5rem 1rem; font-size: 1rem; }
 
-#dashboard { 
+/* Dashboard and Admin Dashboard containers */
+/* Removed generic flex properties from .dashboard-container */
+.dashboard-container { 
     overflow: auto; 
-    flex-grow: 1; /* Allow dashboard to take remaining space */
-    display: flex; /* Make dashboard itself a flex container */
-    flex-direction: column; /* Stack sections vertically */
+    flex-grow: 1; 
+    padding: 2rem; 
+    gap: 1.5rem; 
+    align-items: flex-start; /* Align columns to the top */
 }
 
-.dashboard-container { 
-    display: flex; 
-    gap: 1.5rem; 
-    padding: 2rem; 
+/* Specific layout for the main dashboard (3 columns) */
+#dashboard { /* This is the parent of task-form-container and task-board */
+    display: flex; /* Kept display flex here for overall dashboard container */
+    flex-direction: column; /* This means task-form-container and task-board stack */
+    /* Removed flex-wrap, as task-form-container and task-board should always stack */
+}
+
+#task-board { /* NEW: Explicitly target task-board for its children (To Do, In Progress, Done) */
+    display: flex;
+    flex-direction: row; /* CHANGED: Arrange task columns (To Do, In Progress, Done) horizontally */
     flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
-    flex-grow: 1; /* Allow task board to take remaining space */
-    align-items: flex-start; /* Align columns to the top */
+    gap: 1.5rem; /* Ensure gap between columns */
+    width: 100%; /* Ensure it takes full width within #dashboard */
+    justify-content: flex-start; /* Align columns to start */
+    align-items: flex-start; /* Align items to top */
+}
+
+
+/* Specific layout for the admin dashboard (User Management, All Tasks Overview side-by-side) */
+#admin-dashboard-section {
+    display: flex; /* Makes the admin dashboard a flex container */
+    flex-direction: row; /* Arrange direct children (task-column) horizontally */
+    flex-wrap: wrap; /* Allow these main sections to wrap on smaller screens */
 }
 
 .task-column {
@@ -252,13 +278,27 @@ header .controls button:hover {
     -webkit-backdrop-filter: blur(12px);
     border-radius: 12px; 
     padding: 1rem;
-    width: 320px; /* Fixed width for columns */
     flex-shrink: 0; 
     min-height: 300px;
     box-shadow: 0 4px 8px var(--shadow-color); /* Added shadow to columns */
     display: flex; /* Make column a flex container */
-    flex-direction: column; /* Stack items vertically */
+    flex-direction: column; /* Stack items vertically within the column */
 }
+
+/* Width for task columns in the main dashboard (3 columns) */
+#task-board .task-column { /* CHANGED: Target .task-column inside #task-board */
+    flex: 1 1 calc(33.333% - 1rem); /* Roughly 3 columns with gap */
+    max-width: calc(33.333% - 1rem);
+    min-width: 280px; /* Minimum width for main dashboard columns */
+}
+
+/* Width for task columns in the admin dashboard (User Management, All Tasks Overview - side-by-side) */
+#admin-dashboard-section .task-column {
+    flex: 1 1 calc(50% - 0.75rem); /* Each column takes roughly half the width, accounting for gap */
+    max-width: calc(50% - 0.75rem); /* Max width to ensure two columns */
+    min-width: 300px; /* Minimum width before wrapping to next row on smaller screens */
+}
+
 .task-column h2 { 
     font-size: 1.1rem; 
     margin-top: 0; 
@@ -470,52 +510,6 @@ header .controls button:hover {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-/* --- NEW: Pomodoro Timer Styles --- */
-#pomodoro-timer {
-    background-color: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 4px 8px var(--shadow-color);
-    padding: 1.5rem;
-    text-align: center;
-    margin: 1.5rem 2rem 0rem; /* Adjusted margin */
-}
-
-#pomodoro-timer h2 {
-    font-size: 1.2rem;
-    margin-top: 0;
-    color: var(--text-color);
-}
-
-.timer-display {
-    font-family: 'Share Tech Mono', monospace; /* A digital-looking font */
-    font-size: 4rem;
-    font-weight: bold;
-    color: var(--accent-color);
-    margin: 1rem 0 1.5rem;
-    letter-spacing: 0.1em;
-    text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); /* Subtle glow */
-    transition: color 0.3s ease;
-}
-
-.timer-controls button {
-    background-color: var(--primary-button-bg);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    margin: 0 0.5rem;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.timer-controls button:hover {
-    background-color: var(--primary-button-hover-bg);
-    transform: translateY(-2px);
-}
-
 /* --- NEW: Task Details Modal Styles --- */
 /* This reuses and overrides the general .modal-backdrop and .modal-content */
 #task-details-modal .modal-content {
@@ -579,7 +573,7 @@ body.dark-mode #task-details-modal .modal-content {
 #modal-task-description:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
 
 #save-task-details-btn {
@@ -754,6 +748,155 @@ body.dark-mode .vault-btn.secondary {
     background-color: var(--secondary-button-hover-bg);
 }
 
+/* New styles for Admin Panel User Management and All Tasks Overview */
+/* Base user-card styling - focus on internal layout, not visual appearance */
+.user-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    /* Removed margin-bottom, padding-bottom, border-bottom from here */
+    /* These properties will be defined by the specific selectors below */
+}
+
+.user-card h3 {
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+}
+
+.user-role-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.user-role-control label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.role-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 1.5rem 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-color); /* Default text color */
+    position: relative;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1em;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Dynamic colors for role dropdown */
+.role-select.role-user {
+    color: var(--role-user-color);
+    border-color: var(--role-user-color);
+}
+
+.role-select.role-admin {
+    color: var(--role-admin-color);
+    border-color: var(--role-admin-color);
+}
+
+.save-role-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    margin-left: 0.5rem;
+}
+
+.user-actions {
+    margin-top: 0.5rem;
+}
+
+.delete-user-btn {
+    background-color: var(--high-priority-color); /* Red for delete */
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.delete-user-btn:hover {
+    background-color: #dc2626; /* Darker red on hover */
+}
+
+/* Placeholder text for empty lists */
+.placeholder-text {
+    text-align: center;
+    opacity: 0.6;
+    padding: 1rem;
+    font-style: italic;
+}
+
+/* Styles for horizontal layout of cards within admin lists */
+/* This section controls the layout of cards *within* User Management and All Tasks Overview */
+#admin-users-list,
+#admin-all-tasks-list {
+    display: flex;
+    flex-direction: row; /* Arrange items horizontally */
+    flex-wrap: wrap; /* Allow cards to wrap to the next line within their section */
+    gap: 1rem; /* Space between cards */
+    justify-content: flex-start; /* Align cards to the start */
+    align-items: flex-start; /* Align items to the top */
+    width: 100%; /* Ensure container takes full width of its parent column */
+    padding: 0; 
+    margin: 0;
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+/* Adjust card width within admin lists to allow multiple per row */
+#admin-users-list .user-card,
+#admin-all-tasks-list .task-card {
+    flex: 1 1 calc(33.333% - 1rem); /* Aim for 3 cards per row, adjusting for gap */
+    min-width: 200px; /* Ensure a minimum width for readability */
+    max-width: 350px; /* Ensure a maximum width */
+    margin-top: 0; 
+    padding: 1rem; /* Ensure consistent padding */
+    background-color: var(--card-bg); /* Ensure background color matches task cards */
+    border: 1px solid var(--border-color); /* A subtle border all around */
+    border-left: 4px solid transparent; /* Keep left border for priority if applicable */
+    border-radius: 6px; /* Ensure rounded corners */
+    box-shadow: 0 2px 4px var(--shadow-color); /* Keep card shadow */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    margin-bottom: 0; /* Ensure no vertical margin between cards in the row */
+}
+
+
+
+/* Specific adjustments for user-card within admin list to maintain internal vertical stacking */
+#admin-users-list .user-card {
+    display: flex;
+    flex-direction: column; 
+    gap: 0.5rem;
+}
+
+/* Specific adjustments for task-card within admin list to maintain internal vertical stacking */
+#admin-all-tasks-list .task-card {
+    display: flex;
+    flex-direction: column; 
+    gap: 0.5rem;
+}
+
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     #sidebar {
@@ -801,13 +944,32 @@ body.dark-mode .vault-btn.secondary {
     #add-task-form .add-task-btn {
         width: 100%;
     }
-    #pomodoro-timer {
-        margin: 1rem;
-    }
     #task-details-modal .modal-content, .modal-content.vault-style {
         padding: 1.5rem;
     }
     #task-details-modal h3 {
         font-size: 1.5rem;
+    }
+
+    /* Adjust cards within admin lists for single column on small screens */
+    /* On small screens, we want them to wrap, so revert flex-wrap to 'wrap' */
+    #admin-users-list,
+    #admin-all-tasks-list {
+        flex-wrap: wrap; /* Allow wrapping on small screens for better readability */
+        overflow-x: hidden; /* No horizontal scroll on small screens */
+        justify-content: center; /* Center items when wrapped */
+    }
+
+    #admin-users-list .user-card,
+    #admin-all-tasks-list .task-card {
+        flex: 1 1 calc(100% - 1rem); /* Single column on small screens with gap */
+        max-width: calc(100% - 1rem);
+        min-width: unset; /* Allow to shrink to fit small screens */
+        border-bottom: 1px solid var(--border-color); /* Add border back for individual cards when stacked */
+    }
+    /* Remove bottom border for the very last card on small screens when stacked */
+    #admin-users-list .user-card:last-child,
+    #admin-all-tasks-list .task-card:last-child {
+        border-bottom: none;
     }
 }

@@ -74,11 +74,11 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="active"><a href="#">Dashboard</a></li>
-                    <li><a href="#">Projects</a></li>
-                    <li><a href="#">Team</a></li>
-                    <li><a href="#">Analytics</a></li>
-                    <li><a href="#">Settings</a></li>
+                    <li class="active"><a href="#" id="dashboard-link">Dashboard</a></li>
+                    <!-- New Admin Link (conditionally visible via JavaScript based on user role) -->
+                    <li id="admin-panel-link" class="hidden">
+                        <a href="#" id="show-admin-panel">Admin Panel</a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -97,19 +97,6 @@
             </header>
             
             <div id="dashboard">
-                <!-- NEW: Pomodoro Timer -->
-                <section id="pomodoro-timer" class="dashboard-widget">
-                    <h2>Pomodoro Timer</h2>
-                    <div class="timer-display">
-                        <span id="timer-minutes">25</span>:<span id="timer-seconds">00</span>
-                    </div>
-                    <div class="timer-controls">
-                        <button id="timer-start">Start</button>
-                        <button id="timer-pause">Pause</button>
-                        <button id="timer-reset">Reset</button>
-                    </div>
-                </section>
-
                 <!-- MODIFIED: Task Form Container (with Due Date) -->
                 <section class="task-form-container">
                     <form id="add-task-form">
@@ -146,6 +133,26 @@
                         <h2>Done</h2>
                     </div>
                 </section>
+            </div>
+
+            <!-- New Admin Dashboard Section (initially hidden) -->
+            <div id="admin-dashboard-section" class="hidden dashboard-container">
+                <h2>Admin Dashboard</h2>
+                <section class="admin-users-list-container task-column">
+                    <h3>User Management</h3>
+                    <div id="admin-users-list">
+                        <!-- User list will be populated by JavaScript -->
+                        <p class="placeholder-text">Loading users...</p>
+                    </div>
+                </section>
+                <section class="admin-tasks-overview task-column">
+                    <h3>All Tasks Overview</h3>
+                    <div id="admin-all-tasks-list">
+                        <!-- All tasks will be populated by JavaScript -->
+                        <p class="placeholder-text">Loading all tasks...</p>
+                    </div>
+                </section>
+                <!-- Add other admin tools here as needed -->
             </div>
             
             <footer id="app-footer">
@@ -203,6 +210,22 @@
             <div class="modal-actions">
                 <button id="close-vault-modal" class="vault-btn secondary">Cancel</button>
                 <button class="vault-btn primary">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Confirmation/Alert Modal -->
+    <div id="generic-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <span class="close-button" id="generic-modal-close-btn">&times;</span>
+            <div class="modal-header">
+                <h3 id="generic-modal-title"></h3>
+            </div>
+            <div class="modal-body">
+                <p id="generic-modal-message"></p>
+            </div>
+            <div class="modal-actions" id="generic-modal-actions">
+                <!-- Buttons will be injected by JS -->
             </div>
         </div>
     </div>
