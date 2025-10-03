@@ -14,7 +14,11 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5501; // Ensure this matches your frontend
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://mini-iii.vercel.app', // Your frontend URL
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB Connection
