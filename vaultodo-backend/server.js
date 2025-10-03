@@ -15,7 +15,8 @@ const PORT = process.env.PORT || 5501; // Ensure this matches your frontend
 
 // Middleware
 app.use(cors({
-  origin: 'https://mini-iii.vercel.app', // Your frontend URL
+  origin: 'https://mini-iii.vercel.app',
+  'https://mini-61oh8p7c2-krithzz005s-projects.vercel.app',// Your frontend URL
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   credentials: true
 }));
