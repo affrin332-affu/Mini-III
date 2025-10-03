@@ -1,20 +1,19 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const cors = require('cors');
+
 
 const app = express();
 
 // --- CORS: support multiple frontends ---
 const allowedOrigins = [
-  'https://mini-iii-rho.vercel.app',
-  'https://mini-iii-t.vercel.app',
-  'https://mini-61oh8p7c2-krithzz005s-projects.vercel.app',
-  'http://localhost:3000', // Local frontend
-  'http://localhost:5501'  // API direct testing
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://mini-iii-fa85.vercel.app'  // ADD THIS LINE
 ];
 app.use(cors({
   origin: function (origin, callback) {
