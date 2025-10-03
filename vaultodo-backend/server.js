@@ -1,35 +1,39 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+const cors = require('cors'); // ← Keep only ONE
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto'); // For generating password reset tokens
+const crypto = require('crypto');
 
 const app = express();
-const cors = require('cors');
+
+// CORS Configuration - Keep only ONE with all allowed origins
 app.use(cors({
-  origin: ['https://mini-iii-rho.vercel.app', 'http://localhost:3000'] // Add your Vercel URL
+  origin: [
+    'https://mini-iii-rho.vercel.app',
+    'https://mini-iii.vercel.app',
+    'https://mini-61oh8p7c2-krithzz005s-projects.vercel.app',
+    'http://localhost:3000'
+  ],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: true
 }));
+
+app.use(express.json());
+
 app.get('/', (req, res) => {
   res.send('Hello! Server is running.');
 });
 
-const PORT = process.env.PORT || 5501; // Ensure this matches your frontend
-
-// Middleware
-app.use(cors({
-  origin: 'https://mini-iii.vercel.app',
-  'https://mini-61oh8p7c2-krithzz005s-projects.vercel.app',// Your frontend URL
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  credentials: true
-}));
-app.use(express.json());
+const PORT = process.env.PORT || 5501;
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB.'))
   .catch(err => console.error('Could not connect to MongoDB:', err));
+
+// ... rest of your code stays the same
 
 // MongoDB Schemas
 const userSchema = new mongoose.Schema({
