@@ -7,6 +7,10 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto'); // For generating password reset tokens
 
 const app = express();
+app.get('/', (req, res) => {
+  res.send('Hello! Server is running.');
+});
+
 const PORT = process.env.PORT || 5501; // Ensure this matches your frontend
 
 // Middleware
