@@ -213,7 +213,7 @@ signupForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('signup-password').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -246,7 +246,7 @@ signinForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('signin-password').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/signin`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
