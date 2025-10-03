@@ -13,7 +13,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://mini-iii-fa85.vercel.app'  // ADD THIS LINE
+  'https://mini-iii-kk.vercel.app'  // ADD THIS LINE
 ];
 app.use(cors({
   origin: function (origin, callback) {
