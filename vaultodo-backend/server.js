@@ -7,6 +7,10 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto'); // For generating password reset tokens
 
 const app = express();
+const cors = require('cors');
+app.use(cors({
+  origin: ['https://mini-iii-rho.vercel.app', 'http://localhost:3000'] // Add your Vercel URL
+}));
 app.get('/', (req, res) => {
   res.send('Hello! Server is running.');
 });
