@@ -1,11 +1,9 @@
 {
   "dependencies": {
     "mongodb": "^6.18.0"
-  }
+  },
   "scripts": {
-  "build": "react-scripts build"
+    "build": "react-scripts build"
+  }
 }
 
- 
-
-}
