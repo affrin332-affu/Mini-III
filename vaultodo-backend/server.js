@@ -12,7 +12,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://mini-iii-n1-bwaiwzdpk-affrin332-affus-projects.vercel.app'
+  'https://mini-iii-n2.vercel.app'
 ];
 
 app.use(cors({
