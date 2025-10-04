@@ -1,12 +1,10 @@
 require('dotenv').config();
-const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const cors = require('cors');
 
-const app = express();
 
 // --- CORS: support multiple frontends ---
 const allowedOrigins = [
@@ -26,10 +24,16 @@ app.use(cors({
   credentials: true
 }));
 
+const express = require('express');
+const path = require('path');
+const app = express();
 
-app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => res.send('Hello! VaulToDo Server is running.'));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 
 const PORT = process.env.PORT || 5501;
 
