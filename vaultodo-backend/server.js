@@ -12,12 +12,10 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://mini-iii-n1-6do1fgx31-affrin332-affus-projects.vercel.app'
+  'https://mini-iii-n1-ga7ai89qs-affin332-affus-projects.vercel.app'
 ];
-
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
@@ -26,6 +24,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   credentials: true
 }));
+
 
 app.use(express.json());
 
